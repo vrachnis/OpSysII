@@ -1,0 +1,4 @@
+This is a map-reduce program for hadoop calculating the TF-IDF values
+for every word in a set of input text files.
+
+This was developed as a part of a school project.
