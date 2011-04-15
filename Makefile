@@ -10,7 +10,8 @@ HADOOP_HOME = ${HOME}/hadoop
 
 # The classes that need compiling
 CLASSES = Tf.java \
-	  Idf.java
+	  Idf.java \
+	  Index.java
 
 # This only works for 1 package.
 # TODO: fix for 2 or more class files
