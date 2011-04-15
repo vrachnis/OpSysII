@@ -106,14 +106,14 @@ public class Tf
 	idf.setMapOutputKeyClass(Text.class);
 	idf.setMapOutputValueClass(Text.class);
 	idf.setOutputKeyClass(Text.class);
-	idf.setOutputFormatClass(SequenceFileOutputFormat.class);
-	idf.setOutputValueClass(MapWritable.class);
+	//idf.setOutputFormatClass(SequenceFileOutputFormat.class);
+	idf.setOutputValueClass(Text.class);
 	idf.setNumReduceTasks(5);
 
 	FileInputFormat.addInputPath(idf, middlePath);
         FileOutputFormat.setOutputPath(idf, outputPath);
 
-	idf.getConfiguration().setInt("num", filesNo);
+	idf.getConfiguration().setInt("filesNo", filesNo);
 
 	idf.setJobName(otherargs[2] + " TF-IDF calculation");
 	//idf.addDependingJob(tf);

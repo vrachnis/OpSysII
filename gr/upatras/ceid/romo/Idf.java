@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.lang.Math;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -35,9 +36,10 @@ public class Idf
 	}
     }
 
-    public static class IdfReduce extends Reducer<Text, Text, Text, MapWritable>
+    public static class IdfReduce extends Reducer<Text, Text, Text, Text>
     {
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+	    String tfidfs = "";
 	    Map<String, String> outputMap = new HashMap<String, String>();
 	    IntWritable filesNo = new IntWritable(context.getConfiguration().getInt("filesNo", 1));
 	    int docsCount = 0;
@@ -47,27 +49,19 @@ public class Idf
 		outputMap.put(tf.toString().split(" ")[1], tf.toString().split(" ")[0]);
 	    }
 
-	    MapWritable outMap = new MapWritable();
+	    double idf = Math.log10(((double) filesNo.get()) / docsCount);
 	    for (Map.Entry<String, String> entry : outputMap.entrySet()) {
-		DoubleWritable tf = new DoubleWritable(Double.parseDouble(entry.getValue()));
-		DoubleWritable idf = new DoubleWritable(Math.log10(((double) filesNo.get()) / docsCount));
-		DoubleWritable tfidf = new DoubleWritable(tf.get()*idf.get());
-		MapWritable docMap = new MapWritable();
-
-		docMap.put(new Text("tf"), tf);
-		docMap.put(new Text("idf"), idf);
-		docMap.put(new Text("tfidf"), tfidf);
-		outMap.put(new Text(entry.getKey()),docMap);
+		tfidfs += entry.getKey() + "-" + entry.getValue() + ", ";
 	    }
 
-	    context.write(key, outMap);
+	    tfidfs += String.valueOf(idf);
+	    context.write(key, new Text(tfidfs));
 	}
     }
 
     public static void main(String[] args) throws Exception 
     {
 	Configuration conf = new Configuration();
-//      String otherargs[] = new GenericOptionsParser(conf, args).getRemainingArgs();
 	Job idf = new Job(conf, "IDF");
 	idf.setJarByClass(Idf.class);
 	idf.setMapperClass(IdfMap.class);
@@ -76,7 +70,7 @@ public class Idf
 	idf.setMapOutputValueClass(Text.class);
 	idf.setOutputKeyClass(Text.class);
 	idf.setOutputFormatClass(SequenceFileOutputFormat.class);
-	idf.setOutputValueClass(MapWritable.class);
+	idf.setOutputValueClass(Text.class);
 
 	Path inputPath = new Path("altq");
 	Path outputPath = new Path("altqidf");
@@ -88,7 +82,7 @@ public class Idf
 	FileInputFormat.addInputPath(idf, middlePath);
         FileOutputFormat.setOutputPath(idf, outputPath);
 
-	idf.getConfiguration().setInt("num", filesNo);
+	idf.getConfiguration().setInt("filesNo", filesNo);
 
 	idf.setJobName("TF-IDF for " + String.valueOf(filesNo) + " files");
 	idf.waitForCompletion(true);
