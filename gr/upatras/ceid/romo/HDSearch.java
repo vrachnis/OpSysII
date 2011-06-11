@@ -51,12 +51,16 @@ public class HDSearch
     {
 	public void reduce(Text file, Iterable<DoubleWritable> values, Context context) throws IOException, InterruptedException {
 	    Double relativity = 0.0;
-	    
+	    int minCount = context.getConfiguration().getStrings("terms").length;
+	    int count = 0;
+
 	    for (DoubleWritable metric : values) {
 		relativity += metric.get();
+		count++;
 	    }
 
-	    context.write(file, new DoubleWritable(relativity));
+	    if (count == minCount)
+		context.write(file, new DoubleWritable(relativity));
 	}
     }
 

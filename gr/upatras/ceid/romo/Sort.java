@@ -39,13 +39,13 @@ public class Sort
     {
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 	    Map<String, Double> outputMap = new HashMap<String, Double>();
+	    String answer = "";
 
 	    for (Text file : values) {
 		String[] dim = file.toString().split(Pattern.quote("-"));
 		outputMap.put(dim[1], Double.valueOf(dim[0].replaceAll("-","")));
 	    }
 
-	    String answer = "";
 	    while (!outputMap.isEmpty()) {
 		Double max = 0.0;
 		String maxtext = "";
@@ -63,7 +63,9 @@ public class Sort
 		outputMap.remove(maxtext);
 	    }
 
-
+	    if (answer.equals(""))
+		answer = "Nothing relative found";
+	    
 	    context.write(key, new Text(answer));
 	}
     }
