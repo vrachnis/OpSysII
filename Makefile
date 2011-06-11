@@ -9,7 +9,8 @@ REMOTE_HOST = romo.ceid.upatras.gr
 HADOOP_HOME = ${HOME}/hadoop
 
 # The classes that need compiling
-CLASSES = HDSearch.java
+CLASSES = HDSearch.java \
+	  Sort.java
 
 # This only works for 1 package.
 # TODO: fix for 2 or more class files
@@ -24,7 +25,7 @@ all: $(TITLE)_classes $(TITLE)_classes/$(BYTECODE)
 jar: $(TITLE).jar
 
 $(TITLE)_classes/$(PACKAGE)/%.class: $(PACKAGE)/%.java
-	$(JC) -classpath $(HADOOP_HOME)/hadoop-0.20.2-core.jar:$(HADOOP_HOME)/lib/commons-cli-1.2.jar:. -d $(TITLE)_classes $<
+	$(JC) -Xlint:unchecked -classpath $(HADOOP_HOME)/hadoop-0.20.2-core.jar:$(HADOOP_HOME)/lib/commons-cli-1.2.jar:. -d $(TITLE)_classes $<
 
 $(TITLE)_classes:
 	$(MKDIR) $(TITLE)_classes

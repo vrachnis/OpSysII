@@ -1,5 +1,7 @@
 package gr.upatras.ceid.romo;
 
+import gr.upatras.ceid.romo.Sort.*;
+
 import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.Arrays;
@@ -70,13 +72,12 @@ public class HDSearch
 	    return;
 	}
 
-	Job search = new Job(conf,"search");
+	Job search = new Job(conf,"searching the documents");
 	search.setJarByClass(HDSearch.class);
 	search.setMapperClass(SMap.class);
 	search.setReducerClass(SReduce.class);
 	search.setOutputKeyClass(Text.class);
 	search.setOutputValueClass(DoubleWritable.class);
-	//search.setNumReduceTasks(5);
 
 	Path inputPath = new Path("index");
 	Path outputPath = new Path("results");
@@ -90,5 +91,25 @@ public class HDSearch
 	search.getConfiguration().setStrings("terms", otherargs);
 
 	search.waitForCompletion(true);
+
+	conf = new Configuration();
+	Job sort = new Job(conf,"sorting results");
+	sort.setJarByClass(Sort.class);
+	sort.setMapperClass(SortMap.class);
+	sort.setReducerClass(SortReduce.class);
+	sort.setOutputKeyClass(Text.class);
+	sort.setOutputValueClass(Text.class);
+
+	inputPath = new Path("results");
+	outputPath = new Path("sorted");
+	fs = inputPath.getFileSystem(conf);
+	if (fs.exists(outputPath))
+	    fs.delete(outputPath, true);
+
+	FileInputFormat.addInputPath(sort, inputPath);
+	FileOutputFormat.setOutputPath(sort, outputPath);
+
+	sort.waitForCompletion(true);
+
     }
 }
