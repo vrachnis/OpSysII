@@ -7,10 +7,12 @@ SCP = /usr/bin/scp
 TITLE = TfIdf
 REMOTE_HOST = romo.ceid.upatras.gr
 HADOOP_HOME = ${HOME}/hadoop
+HBASE_HOME = ${HOME}/hbase
 
 # The classes that need compiling
 CLASSES = HDSearch.java \
-	  Sort.java
+	  Sort.java \
+	  HBSave.java
 
 # This only works for 1 package.
 # TODO: fix for 2 or more class files
@@ -25,7 +27,7 @@ all: $(TITLE)_classes $(TITLE)_classes/$(BYTECODE)
 jar: $(TITLE).jar
 
 $(TITLE)_classes/$(PACKAGE)/%.class: $(PACKAGE)/%.java
-	$(JC) -Xlint:unchecked -classpath $(HADOOP_HOME)/hadoop-0.20.2-core.jar:$(HADOOP_HOME)/lib/commons-cli-1.2.jar:. -d $(TITLE)_classes $<
+	$(JC) -Xlint:unchecked -classpath $(HADOOP_HOME)/hadoop-0.20.2-core.jar:$(HADOOP_HOME)/lib/commons-cli-1.2.jar:$(HBASE_HOME)/hbase-0.20.6.jar:. -d $(TITLE)_classes $<
 
 $(TITLE)_classes:
 	$(MKDIR) $(TITLE)_classes
