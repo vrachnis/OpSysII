@@ -48,3 +48,4 @@ client: $(CLIENT)
 clean:
 	$(RM) -r $(TITLE)_classes
 	$(RM) $(TITLE).jar
+	$(RM) *.class
