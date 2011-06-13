@@ -1,12 +1,3 @@
-/* 
- * javac -Xlint:unchecked -classpath 
- * ~/hbase/hbase-0.20.6.jar:$HOME/hadoop/hadoop-0.20.2-core.jar:$HOME/hadoop/lib/commons-cli-1.2.jar. 
- * gr/upatras/ceid/romo/CliSearch.java
- *
- */
-
-package gr.upatras.ceid.romo;
-
 import java.util.Vector;
 import java.util.List;
 import java.util.ArrayList;

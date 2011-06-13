@@ -16,6 +16,8 @@ CLASSES = HDSearch.java \
 	  HBSave.java \
 	  CaSave.java
 
+CLIENT = CliSearch.java
+
 # This only works for 1 package.
 # TODO: fix for 2 or more class files
 #PACKAGE := $(shell head -1 $(CLASSES) | cut -d" " -f2 | sed 's/\./\//g; s/;//')
@@ -39,6 +41,9 @@ $(TITLE)_classes:
 
 send: $(TITLE).jar
 	$(SCP) $(TITLE).jar $(REMOTE_HOST):
+
+client: $(CLIENT)
+	$(JC) -Xlint:unchecked -classpath $(HOME)/hbase/hbase-0.20.6.jar:$(HOME)/hadoop/hadoop-0.20.2-core.jar:$(HOME)/hadoop/lib/commons-cli-1.2.jar:. $(CLIENT)
 
 clean:
 	$(RM) -r $(TITLE)_classes
