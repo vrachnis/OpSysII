@@ -46,7 +46,6 @@ public class CaSave
     public static class CaReduce extends Reducer<Text, Text, ByteBuffer, List<Mutation>>
     {
 	public void reduce(Text lemma, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-	    System.out.println("HELLO REDUCER");
 	    List<Mutation> results = new ArrayList<Mutation>();
 	    List<Column> columns = new ArrayList<Column>();
 	    List<Column> dfc = new ArrayList<Column>();
@@ -108,8 +107,8 @@ public class CaSave
 	Configuration conf = new Configuration();
 	String[] otherargs = new GenericOptionsParser(conf, args).getRemainingArgs();
 
-	if (otherargs.length < 1) {
-	    System.out.println("You need at least 1 argument:");
+	if (otherargs.length != 1) {
+	    System.out.println("You need at 1 argument:");
 	    System.out.println("<server>");
 
 	    return;
@@ -123,10 +122,13 @@ public class CaSave
 	caSave.setMapOutputValueClass(Text.class);
 
 	caSave.setOutputFormatClass(ColumnFamilyOutputFormat.class);
+	// lemma created by:
+	// create column family lemma with column_type = Super and comparator = UTF8Type and default_validation_class=UTF8Type and key_validation_class=UTF8Type and subcomparator=UTF8Type;
 	ConfigHelper.setOutputColumnFamily(caSave.getConfiguration(), "lemmas", "lemma");
 
 	ConfigHelper.setRpcPort(caSave.getConfiguration(), "9160");
-	ConfigHelper.setInitialAddress(caSave.getConfiguration(), "romo.ceid.upatras.gr");
+	ConfigHelper.setInitialAddress(caSave.getConfiguration(), otherargs[0]);
+	ConfigHelper.setPartitioner(caSave.getConfiguration(), "org.apache.cassandra.dht.RandomPartitioner");
 
 	Path inputPath = new Path("index");
 
