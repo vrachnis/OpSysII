@@ -24,6 +24,8 @@ CLIENT = CliSearch.java
 PACKAGE = gr/upatras/ceid/romo
 BYTECODE := $(patsubst %.java, $(TITLE)_classes/$(PACKAGE)/%.class, $(CLASSES))
 
+CLASSPATH = $(HBASE_HOME)/hbase-0.20.6.jar:$(HADOOP_HOME)/hadoop-0.20.2-core.jar:$(HADOOP_HOME)/lib/commons-logging-1.0.4.jar:$(HBASE_HOME)/lib/zookeeper-3.2.2.jar:$(HBASE_HOME)/lib/log4j-1.2.15.jar:$(CASSANDRA_HOME)/lib/apache-cassandra-0.8.0.jar:$(CASSANDRA_HOME)/lib/apache-cassandra-thrift-0.8.0.jar:$(CASSANDRA_HOME)/lib/libthrift-0.6.jar:$(CASSANDRA_HOME)/lib/slf4j-api-1.6.1.jar:.
+
 .PHONY: send clean jar
 
 all: $(TITLE)_classes $(TITLE)_classes/$(BYTECODE)
@@ -42,8 +44,21 @@ $(TITLE)_classes:
 send: $(TITLE).jar
 	$(SCP) $(TITLE).jar $(REMOTE_HOST):
 
-client: $(CLIENT)
-	$(JC) -Xlint:unchecked -classpath $(HOME)/hbase/hbase-0.20.6.jar:$(HOME)/hadoop/hadoop-0.20.2-core.jar:$(HOME)/hadoop/lib/commons-cli-1.2.jar:. $(CLIENT)
+CliSearch.class: CliSearch.java
+	$(JC) -Xlint:unchecked -classpath $(HBASE_HOME)/hbase-0.20.6.jar:$(HADOOP_HOME)/hadoop-0.20.2-core.jar:$(HADOOP_HOME)/lib/commons-cli-1.2.jar:$(CASSANDRA_HOME)/lib/apache-cassandra-0.8.0.jar:$(CASSANDRA_HOME)/lib/apache-cassandra-thrift-0.8.0.jar:$(CASSANDRA_HOME)/lib/libthrift-0.6.jar:. $(CLIENT)
+
+example: CliSearch.class
+	@echo
+	@echo "###################################################"
+	@echo "# Running a query for \"zip 00\" on cassandra"
+	@echo "###################################################"
+	@CLASSPATH=$(CLASSPATH) java CliSearch cassandra romo.ceid.upatras.gr zip 00 2>/dev/null
+	@echo
+	@echo "###################################################"
+	@echo "# Running a query for \"zip 00\" on hbase"
+	@echo "###################################################"
+	@CLASSPATH=$(CLASSPATH) java CliSearch hbase romo.ceid.upatras.gr zip 00 2>/dev/null
+	@echo
 
 clean:
 	$(RM) -r $(TITLE)_classes
